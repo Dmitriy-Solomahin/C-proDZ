@@ -7,7 +7,7 @@ namespace Lesson1
     {
         static void Main(string[] args)
         {
-            if (args.Length >= 3 && args.Length % 2 == 1)
+            if (args.Length >= 3 && args.Length % 2 == 1) 
             {
                 List<int> nums = new List<int>();
                 List<string> operations = new List<string>();
