@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{528E8A4F-ABFD-42E4-8DD5-82DA1AA634F2}</ProjectGuid>
+    <ProjectGuid>{1147CC37-8E0B-4312-8279-208DFF26261A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Lesson2</RootNamespace>
-    <AssemblyName>Lesson2</AssemblyName>
+    <RootNamespace>Lesson2_1</RootNamespace>
+    <AssemblyName>Lesson2_1</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FamilyMember.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
