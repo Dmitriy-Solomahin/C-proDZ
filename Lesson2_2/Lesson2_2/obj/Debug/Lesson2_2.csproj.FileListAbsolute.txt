@@ -1,0 +1,7 @@
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\bin\Debug\Lesson2_2.exe.config
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\bin\Debug\Lesson2_2.exe
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\bin\Debug\Lesson2_2.pdb
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\obj\Debug\Lesson2_2.csproj.AssemblyReference.cache
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\obj\Debug\Lesson2_2.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\obj\Debug\Lesson2_2.exe
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_2\Lesson2_2\obj\Debug\Lesson2_2.pdb
