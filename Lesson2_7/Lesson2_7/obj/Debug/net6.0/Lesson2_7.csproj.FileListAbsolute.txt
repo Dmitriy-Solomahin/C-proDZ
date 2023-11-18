@@ -1,0 +1,14 @@
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\bin\Debug\net6.0\Lesson2_7.exe
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\bin\Debug\net6.0\Lesson2_7.deps.json
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\bin\Debug\net6.0\Lesson2_7.runtimeconfig.json
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\bin\Debug\net6.0\Lesson2_7.dll
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\bin\Debug\net6.0\Lesson2_7.pdb
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.AssemblyInfoInputs.cache
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.AssemblyInfo.cs
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.dll
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\refint\Lesson2_7.dll
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.pdb
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\Lesson2_7.genruntimeconfig.cache
+C:\Users\ASUS\Study$\С#\C# pro\basics\Lesson2_7\Lesson2_7\obj\Debug\net6.0\ref\Lesson2_7.dll
