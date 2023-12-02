@@ -31,12 +31,13 @@ namespace Network
             while (true)
             {
                 byte[] buffer = udpClient.Receive(ref iPEndPoint);
-
-                if (buffer == null) break;
                 var messageText = Encoding.UTF8.GetString(buffer);
 
                 Message message = Message.DeserializeFromJson(messageText);
                 message.Print();
+
+                byte[] reply = Encoding.UTF8.GetBytes("Cообщение доставлено");
+                udpClient.Send(reply, reply.Length, iPEndPoint);
             }
         }
 

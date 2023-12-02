@@ -9,7 +9,7 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            SentMessage(args[0], args[1]);
+            SentMessage("dim", "127.0.0.1");//args[0], args[1]);
         }
         public static void SentMessage(string From, string ip)
         {
@@ -32,9 +32,14 @@ namespace Client
                 string json = message.SerializeMessageToJson();
 
                 byte[] data = Encoding.UTF8.GetBytes(json);
-                int checker = udpClient.Send(data, data.Length, iPEndPoint);
-                if (checker == data.Length) { Console.WriteLine("Cообщение отправлено"); }
-                else { Console.WriteLine("Сообщение потерялось"); }
+                udpClient.Send(data, data.Length, iPEndPoint);
+                //if (checker == data.Length) { Console.WriteLine("Cообщение отправлено"); }
+                //else { Console.WriteLine("Сообщение потерялось"); }
+
+                byte[] buffer = udpClient.Receive(ref iPEndPoint);
+                var answer = Encoding.UTF8.GetString(buffer);
+
+                Console.WriteLine(answer);
             }
         }
     }
