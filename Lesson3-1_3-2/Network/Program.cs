@@ -30,14 +30,27 @@ namespace Network
 
             while (true)
             {
-                byte[] buffer = udpClient.Receive(ref iPEndPoint);
-                var messageText = Encoding.UTF8.GetString(buffer);
+                try
+                {
+                    ThreadPool.QueueUserWorkItem(obj => {
+                        byte[] buffer = udpClient.Receive(ref iPEndPoint);
+                        var messageText = Encoding.UTF8.GetString(buffer);
+                        if (messageText == "Exit" || messageText == "exit")
+                        {
+                            throw new ExceptionExit();
+                        }
+                
+                        Message message = Message.DeserializeFromJson(messageText);
+                        message.Print();
 
-                Message message = Message.DeserializeFromJson(messageText);
-                message.Print();
-
-                byte[] reply = Encoding.UTF8.GetBytes("Cообщение доставлено");
-                udpClient.Send(reply, reply.Length, iPEndPoint);
+                        byte[] reply = Encoding.UTF8.GetBytes("Cообщение доставлено");
+                        udpClient.Send(reply, reply.Length, iPEndPoint);
+                    });
+                }catch (ExceptionExit e)
+                {
+                    break;
+                }
+              
             }
         }
 
