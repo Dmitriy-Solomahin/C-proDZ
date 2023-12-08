@@ -9,9 +9,17 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            SentMessage("dim", "127.0.0.1");//args[0], args[1]);
+            for (int i = 0; i < 10; i++)
+            {
+                //string num = "exit";
+                //Task.Run(() =>
+                SentMessage("dim");
+            }
+
         }
-        public static void SentMessage(string From, string ip)
+
+
+        public static void SentMessage(string From,  string ip = "127.0.0.1")
         {
             UdpClient udpClient = new UdpClient();
             IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Parse(ip), 12345);
