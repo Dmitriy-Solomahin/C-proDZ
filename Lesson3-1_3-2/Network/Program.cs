@@ -9,8 +9,6 @@ namespace Network
         static async Task Main(string[] args)
         {
             await Task.Run(() => Server());
-            
-            //Server();
         }
 
         public void task1()
@@ -21,8 +19,6 @@ namespace Network
             Message? msgDeserialized = Message.DeserializeFromJson(json);
         }
 
-
-        // List<Task> tasks = new List<Task>();
         public static async Task  Server()
         {
 
@@ -33,7 +29,7 @@ namespace Network
             var clt = new CancellationTokenSource();
             var token = clt.Token;
             
-            while (!clt.IsCancellationRequested)
+            while (true)
             {
                 try
                 {
@@ -57,32 +53,26 @@ namespace Network
                         udpClient.Send(reply, reply.Length, iPEndPoint);
                     }, token);
                     
-                    //await Task.Delay(1000);
-                    
-                }
-                catch (AggregateException ae)
+                }catch (OperationCanceledException e)
                 {
-                    foreach (Exception e in ae.InnerExceptions)
-                    {
-                        if(e is TaskCanceledException)
-                        {
-                            Console.WriteLine("сервер завершает работу");
-                            break;
-                        }
-                        else Console.WriteLine(e.Message);
-                    }
-                }
-                catch (OperationCanceledException e)
-                {
-                    Console.WriteLine("сервер завершает работу 2");
+                    Console.WriteLine("сервер завершает работу");
                     break;
                 }
-                
-                
+                // почемуто не сработало
+                //catch (AggregateException ae)
+                //{
+                //    foreach (Exception e in ae.InnerExceptions)
+                //    {
+                //        if(e is TaskCanceledException)
+                //        {
+                //            Console.WriteLine("сервер завершает работу");
+                //            break;
+                //        }
+                //        else Console.WriteLine(e.Message);
+                //    }
+                //}   
             }
             clt.Dispose();
-
-
         }
 
     }
