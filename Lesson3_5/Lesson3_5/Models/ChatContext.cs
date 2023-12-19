@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Proxies;
-using Microsoft.EntityFrameworkCore.SqlServer;
 namespace Lesson3_5.Models
 {
     public class ChatContext : DbContext
@@ -8,15 +6,9 @@ namespace Lesson3_5.Models
         public DbSet<User> Users { get; set; }
         public DbSet<Message> Messages { get; set; }
 
-        public ChatContext()
-        {
+        public ChatContext() {}
 
-        }
-
-        public ChatContext(DbContextOptions<ChatContext> dbc) : base(dbc)
-        {
-
-        }
+        public ChatContext(DbContextOptions<ChatContext> dbc) : base(dbc) {}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

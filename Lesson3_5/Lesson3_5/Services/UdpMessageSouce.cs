@@ -1,12 +1,8 @@
 ﻿using Lesson3_5.Abstracts;
 using Lesson3_5.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Lesson3_5.Services
@@ -29,7 +25,7 @@ namespace Lesson3_5.Services
         {
             byte[] buffer = Encoding.UTF8.GetBytes(message.SerialazeMessageToJSON());
 
-         await   _udpClient.SendAsync(buffer, buffer.Length, ep);
+            await   _udpClient.SendAsync(buffer, buffer.Length, ep);
         }
     }
 }
