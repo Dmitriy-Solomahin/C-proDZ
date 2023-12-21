@@ -1,95 +1,120 @@
 ﻿using System.Net.Sockets;
 using System.Net;
-using ChatCommon.Abstractions;
+using ChatNetwork;
 using ChatCommon.Models;
+using NetMQ.Sockets;
+using System.ServiceModel.Channels;
 
 namespace ChatApp
 
 {
-    public class Client<T>
+    public class Client
     {
-        public readonly string _name;
-       
-        public IMessageSourceClient<T> _messageSource;
-        public T remoteEndPoint;
-        public Client(IMessageSourceClient<T> messageSourceClient, string name)
-        {
-            this._name = name;          
+        private readonly string _name;
+        private readonly string _socketListen;
+        private readonly string _socketSender;
+        private Queue<NetMessage> _messages;
+        public NetMQMessageSourceClient _messageSource;
 
-            _messageSource = messageSourceClient;
-            remoteEndPoint = _messageSource.CreateEndpoint();
+        public Client(string name, string socketListen = "tcp://127.0.0.1:5555", string socketSender = "tcp://127.0.0.1:5556")
+        {
+            this._name = name;
+            this._socketListen = socketListen;
+            this._socketSender = socketSender;
+            _messageSource = new NetMQMessageSourceClient();
+            _messages = new Queue<NetMessage>();
         }
 
-        //public UdpClient udpClientClient = new UdpClient();
-        public async Task ClientListener()
+        private async Task ClientListener()
         {
-            while (true)
+            using (var socketListen = new SubscriberSocket(_socketListen))
             {
-                try
+                socketListen.Subscribe("All");
+                socketListen.Subscribe(_name);
+
+                while (true)
                 {
-                    var messageReceived = _messageSource.Receive(ref remoteEndPoint);
+                    try
+                    {
+                        var messageReceived = _messageSource.Receive(socketListen);
 
-                    Console.WriteLine($"Получено сообщение от {messageReceived.NickNameFrom}:");
-                    Console.WriteLine(messageReceived.Text);
+                        messageReceived.PrintGetMessageFrom();
+                        await Confirm(messageReceived);
 
-                    await Confirm(messageReceived, remoteEndPoint);
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Ошибка при получении сообщения: " + ex.Message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Ошибка при получении сообщения: " + ex.Message);
+                    }
                 }
             }
         }
 
-        public async Task Confirm(NetMessage message, T remoteEndPoint)
+        private async Task Confirm(NetMessage message)
         {
             message.Command = Command.Confirmation;
-            await _messageSource.SendAsync(message, remoteEndPoint);
+            _messages.Enqueue(message);
         }
 
 
-        public void Register(T remoteEndPoint)
+        private void Register(DealerSocket socketSender)
         {
-            IPEndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-            var message = new NetMessage() { NickNameFrom = _name, NickNameTo = null, Text = null, Command = Command.Register, EndPoint = ep };
-            _messageSource.SendAsync(message, remoteEndPoint);
+            var message = new NetMessage() { NickNameFrom = _name, NickNameTo = null, Text = null, Command = Command.Register};
+            _messageSource.Send(message, socketSender);
             Console.WriteLine("Мы тута");
         }
 
-        public async Task ClientSender()
+        private async Task ClientSender()
         {
 
-
-            Register(remoteEndPoint);
-
-            while (true)
+            using (var socketSender = new DealerSocket(_socketSender))
             {
-                try
+                Register(socketSender);
+                Task client = Task.Run(async() => {
+                    while (true)
+                    {
+                        try
+                        {
+                            var message = await CreatingMessage();
+                            _messageSource.Send(message, socketSender);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Ошибка при обработке сообщения: " + ex.Message);
+                        }
+                    } 
+                });
+                Task.Run( () =>
                 {
-                    Console.Write("Введите  имя получателя: ");
-                    var nameTo = Console.ReadLine();
-                   
-                    Console.Write("Введите сообщение и нажмите Enter: ");
-                    var messageText = Console.ReadLine();
-
-                    var message = new NetMessage() { Command = Command.Message, NickNameFrom = _name, NickNameTo = nameTo, Text = messageText };
-
-                    await _messageSource.SendAsync(message, remoteEndPoint);
-
-                    Console.WriteLine("Сообщение отправлено.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Ошибка при обработке сообщения: " + ex.Message);
-                }
+                    while (true)
+                    {
+                        if (_messages.Count > 0)
+                        {
+                            var message = _messages.Dequeue();
+                            _messageSource.Send(message, socketSender);
+                        }
+                    }
+                });
+                Task.WaitAll(client);
+                
             }
+        }
+
+        private async Task<NetMessage> CreatingMessage()
+        {
+            Console.Write("Введите  имя получателя: ");
+            var nameTo = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(nameTo)) nameTo = "All";
+
+            Console.Write("Введите сообщение и нажмите Enter: ");
+            var messageText = Console.ReadLine();
+
+            return new NetMessage() { Command = Command.Message, NickNameFrom = _name, NickNameTo = nameTo, Text = messageText };
         }
 
         public async Task Start()
         {
-            //udpClientClient = new UdpClient(port);
-
             new Thread(async () => await ClientListener()).Start();
 
             await ClientSender();

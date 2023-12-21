@@ -21,7 +21,6 @@ namespace ChatCommon.Models
         public DateTime DateTime { get; set; }
         public string? NickNameFrom { get; set; }
         public string? NickNameTo { get; set; }
-        public IPEndPoint? EndPoint { get; set; }
 
         public Command Command { get; set; }
 

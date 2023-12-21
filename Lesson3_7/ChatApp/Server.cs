@@ -1,22 +1,30 @@
-﻿using ChatCommon.Abstractions;
+﻿using ChatNetwork;
 using ChatCommon.Models;
 using ChatDB;
-using System.Net;
-using System.Net.Sockets;
+using NetMQ;
+using NetMQ.Sockets;
+
 
 
 namespace ChatApp
 
 {
-    public class Server<T> 
+    public class Server 
     {
-        Dictionary<string, T> clients = new Dictionary<string, T>();
-        private readonly IMessageSourceServer<T> _messageSource;
-        private T ep;
-        public Server(IMessageSourceServer<T> messageSource)
+        private readonly string _socketListen;
+        private readonly string _socketSender;
+        private readonly NetMQMessageSourceServer _messageSource;
+        private List<string> _clients;
+        private Queue<NetMessage> _messages;
+
+        public Server(string socketListen = "tcp://127.0.0.1:5556", string socketSender = "tcp://127.0.0.1:5555")
         {
-            _messageSource = messageSource;
-            ep = _messageSource.CreateEndpoint();
+            _socketListen = socketListen;
+            _socketSender = socketSender;
+
+            _clients = new List<string>();
+            _messages = new Queue<NetMessage>();
+            _messageSource = new NetMQMessageSourceServer();
         }
 
         bool work = true;
@@ -29,8 +37,9 @@ namespace ChatApp
         {
             Console.WriteLine($" Message Register name = {message.NickNameFrom}");
 
-            if (clients.TryAdd(message.NickNameFrom, _messageSource.CopyEndpoint(message.EndPoint)))
+            if (!_clients.Contains(message.NickNameFrom))
             {
+                _clients.Add(message.NickNameFrom);
                 using (ChatContext context = new ChatContext())
                 {
                     context.Users.Add(new User() { FullName = message.NickNameFrom });
@@ -42,7 +51,7 @@ namespace ChatApp
         }
         private async Task RelyMessage(NetMessage message)
         {
-            if (clients.TryGetValue(message.NickNameTo, out T ep))
+            if (_clients.Contains(message.NickNameTo) || message.NickNameTo.Equals("All"))
             {
                 int? id = 0;
                 using (var ctx = new ChatContext())
@@ -56,10 +65,9 @@ namespace ChatApp
 
                     id = msg.MessageId;
                 }
-
                 message.Id = id;
 
-                await _messageSource.SendAsync(message, ep);
+                _messages.Enqueue(message);
 
                 Console.WriteLine($"Message Relied, from = {message.NickNameFrom} to = {message.NickNameTo}");
             }
@@ -96,29 +104,50 @@ namespace ChatApp
             }
         }
 
-        public async Task Start()
+        private async Task Publisher()
         {
-
-            Console.WriteLine("Сервер ожидает сообщения ");
-
-            while (work)
+            using (var server = new PublisherSocket(_socketSender))
             {
-                try
+                while (work)
                 {
-                    var message = _messageSource.Receive(ref ep);
-                    Console.WriteLine(message.ToString());
-                    await ProcessMessage(message);
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
+                    if (_messages.Count > 0)
+                    {
+                        var msg = _messages.Dequeue();
+                        server.SendMoreFrame(msg.NickNameTo).SendFrame(msg.SerialazeMessageToJSON());
+                    }
                 }
 
             }
-
-
         }
 
+        private async Task Lisener()
+        {
+            Console.WriteLine("Сервер ожидает сообщения ");
+            using (var server = new RouterSocket(_socketListen))
+            {
+                while (work)
+                {
+                    try
+                    {
+                        var message = _messageSource.Receive(server);
+                        Console.WriteLine(message.ToString());
+                        await ProcessMessage(message);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+
+                }
+            }
+        }
+
+        public async Task Start()
+        {
+            new Thread(async () => await Lisener()).Start();
+
+            await Publisher();
+        }
     }
 }
