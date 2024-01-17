@@ -8,15 +8,16 @@ namespace AspClassWorck.Models
         public DbSet<Storage> ProductStorages { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Group> ProductGroups { get; set; }
+        private readonly string _connectionString;
+
 
         public ProductContext() { }
-        public ProductContext(DbContextOptions<ProductContext> options) : base() { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(@"Server=.\SQLExpress; Database=GB_DZ_ASP;Integrated Security=False;TrustServerCertificate=True; Trusted_Connection=True;")
-                .UseLazyLoadingProxies();
+        public ProductContext(string connectionString) {
+            _connectionString = connectionString;
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+            => optionsBuilder.UseSqlServer(_connectionString).UseLazyLoadingProxies();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,6 +1,7 @@
-﻿using AspClassWorck.Models;
+﻿using AspClassWorck.Abstraction;
+using AspClassWorck.Models;
+using AspClassWorck.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AspClassWorck.Controllers
 {
@@ -8,80 +9,30 @@ namespace AspClassWorck.Controllers
     [Route("[controller]")]
     public class GroupController : ControllerBase
     {
-        [HttpGet("getGroup")]
+        private readonly IGroupRepository _groupRepository;
+
+        public GroupController(IGroupRepository groupRepository)
+        {
+            _groupRepository = groupRepository;
+        }
+
+        [HttpGet("get_group")]
         public IActionResult GetGroup()
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    var group = context.ProductGroups.Select(x => new Group()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Descript = x.Descript,
-                    });
-                    return Ok(group);
-                }
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            var groups = _groupRepository.GetGroups();
+            return Ok(groups);
         }
-        [HttpPost("putGroup")]
-        public IActionResult PutGroup([FromQuery] string name, string descript)
+        [HttpPost("add_group")]
+        public IActionResult AddGroup([FromBody] GroupDTO groupDTO)
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    if (!context.ProductGroups.Any(x => x.Name.ToLower().Equals(name)))
-                    {
-                        context.Add(new Group()
-                        {
-                            Name = name,
-                            Descript = descript
-                        });
-                        context.SaveChanges();
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(409);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return StatusCode(500);
-            }
+            var result = _groupRepository.AddGroup(groupDTO);
+            return Ok(result);
         }
-        [HttpDelete("deleteGroup")]
-        public IActionResult DeleteGroup([FromQuery] int groupId)
+        [HttpDelete("delete_group")]
+        public IActionResult DeleteGroup([FromBody] GroupDTO groupDTO)
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    var group = context.ProductGroups.FirstOrDefault(x => x.Id == groupId);
-                    if (group != null)
-                    {
-                        context.ProductGroups.Remove(group);
-                        context.SaveChanges();
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(409);
-                    }
-                }
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            var result = _groupRepository.DeleteGroup(groupDTO);
+            return Ok(result);
         }
 
     }

@@ -1,5 +1,7 @@
-﻿using AspClassWorck.Models;
+﻿using AspClassWorck.Abstraction;
+using AspClassWorck.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace AspClassWorck.Controllers
 {
@@ -7,107 +9,53 @@ namespace AspClassWorck.Controllers
     [Route("[controller]")]
     public class ProductController : ControllerBase
     {
-        [HttpGet("getProduct")]
+        private readonly IProductRepository _productRepository;
+
+        public ProductController(IProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
+        [HttpGet("get_product")]
         public IActionResult GetProduct()
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    var products = context.Products.Select(x => new Product()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Descript = x.Descript,
-                    });
-                    return Ok(products);
-                }
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            var products = _productRepository.GetProducts();
+            return Ok(products);
         }
-        [HttpPost("putProduct")]
-        public IActionResult PutProduct([FromQuery] string name, string descript, int groupId, int price) 
+
+        [HttpGet("get_products_file_csv")]
+        public FileContentResult GetProductFile()
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    if(!context.Products.Any(x => x.Name.ToLower().Equals(name))){
-                        context.Add(new Product()
-                        {
-                            Name = name,
-                            Descript = descript,
-                            GroupId = groupId,
-                            Price = price
-                        });
-                        context.SaveChanges();
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(409);
-                    }
-                }
-            }
-            catch (Exception ex) 
-            {
-                Console.WriteLine(ex.Message);
-                return StatusCode(500);
-            }
+            var result = _productRepository.GetProductsFileCsv();
+            return File(new UTF8Encoding().GetBytes(result), "text/csv", "products.csv"); ;
         }
-        [HttpDelete("deleteProduct")]
-        public IActionResult DeleteProduct([FromQuery] int productId)
+
+        [HttpPost("add_product")]
+        public IActionResult AddProduct([FromBody] ProductDTO productDTO) 
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    var product = context.Products.FirstOrDefault(x => x.Id == productId);
-                    if (product != null)
-                    {
-                        context.Products.Remove(product);
-                        context.SaveChanges();
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(409);
-                    }
-                }
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            var result = _productRepository.AddProduct(productDTO);
+            return Ok(result);
         }
-        [HttpPatch("updateProductPrice")]
-        public IActionResult UpdateProductPrice([FromQuery] int productId, int price)
+
+        [HttpDelete("delete_product")]
+        public IActionResult DeleteProduct([FromBody] ProductDTO productDTO)
         {
-            try
-            {
-                using (var context = new ProductContext())
-                {
-                    var product = context.Products.FirstOrDefault(x => x.Id == productId);
-                    if (product != null)
-                    {
-                        product.Price = price;
-                        context.Products.Update(product);
-                        context.SaveChanges();
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(409);
-                    }
-                }
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            var result = _productRepository.DeleteProduct(productDTO);
+            return Ok(result);
+        }
+
+        [HttpPatch("update_product_price")]
+        public IActionResult UpdateProductPrice([FromBody] ProductDTO productDTO)
+        {
+            var result = _productRepository.UpdateProduct(productDTO);
+            return Ok(result);
+        }
+
+        [HttpGet("get_cache_file_url")]
+        public ActionResult<string> GetCacheFileUrl()
+        {
+            var fileName = _productRepository.GetCacheStatsUrl();
+            return "https://" + Request.Host.ToString() + "/static/" + fileName;
         }
     }
 }
