@@ -1,0 +1,54 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/Group/{method}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7224
+        }
+      ],
+      "UpstreamPathTemplate": "/Group/{method}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Delete" ],
+      "SwaggerKey": "groups"
+    },
+    {
+      "DownstreamPathTemplate": "/Product/{method}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7224
+        }
+      ],
+      "UpstreamPathTemplate": "/Product/{method}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Delete","Patch" ],
+      "SwaggerKey": "products"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7281"
+  },
+  "SwaggerEndPoints": [
+    {
+      "Key": "groups",
+      "TransformByOceloteConfig": false,
+      "Config": {
+        "Name": "AspClassWorck",
+        "Version": "v1",
+        "Url": "https://localhost:7224/swagger/v1/swagger.json"
+      }
+    },
+    {
+      "Key": "products",
+      "TransformByOceloteConfig": false,
+      "Config": {
+        "Name": "AspClassWorck",
+        "Version": "v1",
+        "Url": "https://localhost:7224/swagger/v1/swagger.json"
+      }
+    }
+  ]
+
+}
